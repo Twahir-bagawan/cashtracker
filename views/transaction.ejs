@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= type === 'add' ? 'Add Amount' : 'Reduce Amount' %> | CashTracker</title>
+
+  <style>
+    body {
+      font-family: Poppins, sans-serif;
+      background: #f8fafc;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #1e293b;
+    }
+
+    h2 {
+      color: #334155;
+      margin-top: 10px;
+    }
+
+    form {
+      margin-top: 30px;
+      display: inline-block;
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      color: #475569;
+      font-weight: 500;
+    }
+
+    input {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      width: 250px;
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+
+    /* Two button styles based on type */
+    .btn-add {
+      background: #16a34a;
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 1rem;
+      transition: background 0.2s ease;
+    }
+
+    .btn-add:hover {
+      background: #15803d;
+    }
+
+    .btn-reduce {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 1rem;
+      transition: background 0.2s ease;
+    }
+
+    .btn-reduce:hover {
+      background: #b91c1c;
+    }
+
+    a {
+      text-decoration: none;
+      color: #4f46e5;
+      font-weight: 500;
+    }
+
+  </style>
+</head>
+
+<body>
+  <h1>CashTracker</h1>
+
+  <h2>
+    <%= type === 'add' ? 'Add Balance' : 'Reduce Balance' %> for 
+    <span style="color:#4f46e5;"><%= user.username %></span>
+  </h2>
+
+  <form method="POST">
+    <label for="amount">Amount:</label>
+    <input type="number" name="amount" id="amount" required placeholder="Enter amount">
+
+    <% if (type === 'add') { %>
+      <button type="submit" class="btn-add">Add Amount</button>
+    <% } else { %>
+      <button type="submit" class="btn-reduce">Reduce Amount</button>
+    <% } %>
+  </form>
+
+  <p style="margin-top:30px;">
+    <a href="/profile">← Back to Profile</a>
+  </p>
+</body>
+</html>
