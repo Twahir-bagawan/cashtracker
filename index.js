@@ -1,3 +1,5 @@
+require("dotenv").config(); // ✅ Load environment variables
+
 const express = require("express");
 const connectDB = require("./config/db");
 const userModel = require("./models/usermodel");
@@ -13,7 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 // ✅ Connect to MongoDB
 connectDB();
 
-// ✅ Home route (optional)
+// ✅ Home route
 app.get("/", (req, res) => {
   res.redirect("/profile");
 });
@@ -21,7 +23,7 @@ app.get("/", (req, res) => {
 // ✅ Profile page - shows all users
 app.get("/profile", async (req, res) => {
   try {
-    const users = await userModel.find(); // ✅ returns array of users
+    const users = await userModel.find();
     res.render("profile", { users });
   } catch (error) {
     console.error("❌ Error fetching profile:", error);
@@ -38,12 +40,7 @@ app.get("/create", (req, res) => {
 app.post("/profile", async (req, res) => {
   try {
     const { username, balance } = req.body;
-
-    await userModel.create({
-      username,
-      balance,
-    });
-
+    await userModel.create({ username, balance });
     console.log("✅ User created successfully");
     res.redirect("/profile");
   } catch (error) {
@@ -52,14 +49,19 @@ app.post("/profile", async (req, res) => {
   }
 });
 
-// Show Add/Reduce form
+// ✅ Show Add/Reduce form
 app.get("/transaction/:userId/:type", async (req, res) => {
-  const { userId, type } = req.params;
-  const user = await userModel.findById(userId);
-  res.render("transaction", { user, type });
+  try {
+    const { userId, type } = req.params;
+    const user = await userModel.findById(userId);
+    res.render("transaction", { user, type });
+  } catch (error) {
+    console.error("❌ Error loading transaction page:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
-// Handle Add/Reduce form submission
+// ✅ Handle Add/Reduce form submission
 app.post("/transaction/:userId/:type", async (req, res) => {
   try {
     const { userId, type } = req.params;
@@ -90,25 +92,27 @@ app.post("/transaction/:userId/:type", async (req, res) => {
   }
 });
 
+// ✅ Transaction history
 app.get("/history/:userId", async (req, res) => {
-  const user = await userModel.findById(req.params.userId);
-  const transactions = await transactionModel
-    .find({ userId: req.params.userId })
-    .sort({ date: -1 });
-
-  res.render("history", { user, transactions });
+  try {
+    const user = await userModel.findById(req.params.userId);
+    const transactions = await transactionModel
+      .find({ userId: req.params.userId })
+      .sort({ date: -1 });
+    res.render("history", { user, transactions });
+  } catch (error) {
+    console.error("❌ Error loading history:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 // ✅ Search users by username
 app.get("/search", async (req, res) => {
   try {
     const query = req.query.query?.trim() || "";
-
-    // Use correct model name (userModel)
     const users = await userModel.find({
-      username: { $regex: query, $options: "i" }
+      username: { $regex: query, $options: "i" },
     });
-
     res.render("profile", { users });
   } catch (error) {
     console.error("❌ Error while searching:", error);
@@ -116,8 +120,7 @@ app.get("/search", async (req, res) => {
   }
 });
 
-
-// Show Edit Page
+// ✅ Edit user
 app.get("/edit/:id", async (req, res) => {
   try {
     const user = await userModel.findById(req.params.id);
@@ -129,7 +132,6 @@ app.get("/edit/:id", async (req, res) => {
   }
 });
 
-// Handle Edit Submission
 app.post("/edit/:id", async (req, res) => {
   try {
     const { username } = req.body;
@@ -141,7 +143,6 @@ app.post("/edit/:id", async (req, res) => {
   }
 });
 
-
-
-// ✅ Server start
-app.listen(3000, () => console.log("🚀 Server running on port 3000"));
+// ✅ Start Server (works locally & on Render)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
